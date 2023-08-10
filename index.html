@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title></title>
+      <script src="https://unpkg.com/vue@next"></script>
+
+   </head>
+   <body>
+      <div id="mainDiv" style="width: fit-content; height: fit-content">
+         <div style="display: flex; align-items: center; justify-content: center; width: auto; border: 1px solid black;border-top-left-radius:50%; border-top-right-radius:50%;">
+            Экран
+         </div>
+         <div v-bind:style="{width: 'fit-content',height: 'fit-content'}" >
+            <div v-for="(n, parent_index) in 10" v-bind:style="{width: 'fit-content',height: 'fit-content', display: 'flex'}">
+               <div v-for="(n, index) in 10" v-bind:style="{ color: 'red',  width: '50px',height: '50px',border: '1px solid red', borderRadius: '5px', margin: '3px'}" @mouseover="f_mouseover($event, parent_index, index)" @mouseout="f_mouseout()"  @click="f_click($event, parent_index, index)">
+
+               </div>
+            </div>
+         </div>
+         <span>Выбрано: {{ selected1 }}</span>
+      </div>
+
+
+
+      <script>
+
+         const Places = {
+            data() {
+               return {
+                  selected1: ''
+               }
+            },
+            methods: {
+               f_mouseover(event, _parent_index, _index) {
+                  this.selected1 = "Ряд: "+ (_parent_index+1)+"; Место:"+ (_index+1)
+               },
+               f_mouseout(){
+                  this.selected1 = "";
+               },
+               f_click(event, _parent_index, _index){
+                  alert("Отправка на сервер, ответ сервера смотреть в консоли(может придётся подождать 30 секунд)" );
+
+                  async function ajaxSend(_jsonFile) {
+                     fetch('https://httpbin.org/post',{
+                        method: "post",
+                        headers: {
+                           'Accept': 'application/json',
+                           'Content-Type': 'application/json'
+                        },
+
+                        body: JSON.stringify(_jsonFile)
+                     })
+                     .then(res => res.text())
+                     .then(text => console.log(text));
+                  }
+
+                  ajaxSend({
+                     "userID": "id",
+                     "pointID": String(_parent_index+1) + ";"+ String(_index+1),
+                     "timeID": String(Date())
+                  });
+               }
+            }
+         }
+
+         Vue.createApp(Places).mount('#mainDiv')
+
+      </script>
+   </body>
+</html>
